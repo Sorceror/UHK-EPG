@@ -12,10 +12,11 @@ import gui.TimelinePanel;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.Collections;
@@ -43,6 +44,9 @@ public class EPGApp {
 	
 	private int mouseX = -1;
 
+	/**
+	 * Konstruktor aplikace, vytvari gui a spousti logiku
+	 */
 	public EPGApp() {
 		createGUI();
 		initListeners();
@@ -51,13 +55,15 @@ public class EPGApp {
 		try {
 			List<Channel> channels = ctSource.loadChannels();
 			Collections.sort(channels);
-			fireProgramChange(channels.get(0).getProgrammes().get(0));
 			timelinePanel.setChannels(channels);
 		} catch (DataSourceException e) {
 			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * Vytvari komponenty GUI
+	 */
 	private void createGUI() {
 		window = new JFrame("FIM EPG sample ~ Pavel Janecka 2013");
 		window.setLayout(new GridBagLayout());
@@ -96,17 +102,15 @@ public class EPGApp {
 		window.setVisible(true);
 	}
 	
+	/**
+	 * Registruje a obsluhuje listenery komponent
+	 */
 	private void initListeners() {
 		timelinePanel.addMouseWheelListener(new MouseWheelListener() {
 			
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				int diff = e.getWheelRotation();
-				if (diff > 0) {
-					timelinePanel.zoomIn();
-				} else {
-					timelinePanel.zoomOut();
-				}
+				timelinePanel.zoom(e);
 				timelinePanel.repaint();
 			}
 		});
@@ -115,7 +119,7 @@ public class EPGApp {
 			
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				if (mouseX != -1) {
+				if (mouseX != -1 && SwingUtilities.isRightMouseButton(e)) {
 					timelinePanel.moveTimeline(e.getX() - mouseX);
 					timelinePanel.repaint();
 				}
@@ -127,6 +131,12 @@ public class EPGApp {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				mouseX = e.getX();
+				if (SwingUtilities.isLeftMouseButton(e)) {
+					Program p = timelinePanel.getProgramByCoordinates(e.getX(), e.getY());
+					if (p != null) fireProgramChange(p);
+					timelinePanel.setSelectedProgram(p);
+					timelinePanel.repaint();
+				}
 			}
 
 			@Override
@@ -134,15 +144,36 @@ public class EPGApp {
 				mouseX = -1;
 			}
 		});
+		window.requestFocusInWindow();
+		window.addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_R) {
+					timelinePanel.resetZoom();
+					timelinePanel.resetMoveOfTimeline();
+					timelinePanel.repaint();
+				}
+			}
+		});
 	}
 	
-	public void fireProgramChange(Program program) {
-		this.programIconPanel.setProgram(program);
-		this.programDescriptionPanel.setProgram(program);
-		this.progressBarPanel.setProgram(program);
+	/**
+	 * Nastavuje novy vybrany televizni program vsem komponentam a zajistuje jejich prekresleni
+	 * @param program {@link Program} instance
+	 */
+	private void fireProgramChange(Program program) {
+		programIconPanel.setProgram(program);
+		programDescriptionPanel.setProgram(program);
+		progressBarPanel.setProgram(program);
+		
+		programIconPanel.repaint();
+		programDescriptionPanel.repaint();
+		progressBarPanel.repaint();
 	}
 
 	/**
+	 * main :)
 	 * @param args
 	 */
 	public static void main(String[] args) {

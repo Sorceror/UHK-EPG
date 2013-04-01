@@ -3,7 +3,7 @@
  */
 package tvdata;
 
-import java.awt.Image;
+import java.net.URL;
 import java.util.Date;
 
 /**
@@ -16,8 +16,15 @@ public class Program {
 	private Date endTime;
 	private int length;
 	private String description;
-	private Image image;
+	private URL imageURL;
 	
+	/**
+	 * Konstruktor poradu
+	 * @param title String jmeno poradu
+	 * @param startTime {@link Date} cas a datum zacatku poradu
+	 * @param endTime {@link Date} cas a datum konce poradu
+	 * @param description String popisek poradu
+	 */
 	public Program(String title, Date startTime, Date endTime, String description) {
 		this.title = title;
 		this.startTime = startTime;
@@ -33,15 +40,15 @@ public class Program {
 	/**
 	 * @return the image
 	 */
-	public Image getImage() {
-		return image;
+	public URL getImageURL() {
+		return imageURL;
 	}
 
 	/**
-	 * @param image the image to set
+	 * @param imageURL the imageURL to set
 	 */
-	public void setImage(Image image) {
-		this.image = image;
+	public void setImageURL(URL imageURL) {
+		this.imageURL = imageURL;
 	}
 
 	/**

@@ -11,7 +11,6 @@ import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 import javax.swing.JComponent;
 
@@ -82,7 +81,7 @@ public class Utils {
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
-		return c.getTime();
+		return new Date(c.getTimeInMillis());
 	}
 	
 	/**
@@ -94,6 +93,6 @@ public class Utils {
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		c.add(Calendar.DATE, 1);
-		return c.getTime();
+		return new Date(c.getTimeInMillis());
 	}
 }

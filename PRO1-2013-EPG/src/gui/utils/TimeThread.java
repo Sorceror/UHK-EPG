@@ -13,10 +13,19 @@ public class TimeThread extends Thread {
 	private JComponent component;
 	private long timeToRepaint = 1000;
 	
+	/**
+	 * Kontruktor prekreslovaciho vlakna (cas prekresleni 1s)
+	 * @param component {@link JComponent} komponenta ktera se ma prekreslovat
+	 */
 	public TimeThread(JComponent component) {
 		this.component = component;
 	}
 	
+	/**
+	 * Konstruktor vykreslovaciho vlakna s vybranym casem
+	 * @param component {@link JComponent} komponenta ktera se ma prekreslovat
+	 * @param timeToRepaint long doba za kterou se ma komponenta prekreslit v milisekundach
+	 */
 	public TimeThread(JComponent component, long timeToRepaint) {
 		this(component);
 		this.timeToRepaint = timeToRepaint;
@@ -24,12 +33,14 @@ public class TimeThread extends Thread {
 	
 	@Override
 	public void run() {
-		try {
-			Thread.sleep(timeToRepaint);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		while (true) {
+			try {
+				Thread.sleep(timeToRepaint);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			component.repaint();
 		}
-		component.repaint();
 	}
 	
 }

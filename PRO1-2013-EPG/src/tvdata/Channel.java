@@ -13,13 +13,17 @@ import java.util.List;
 public class Channel implements Comparable<Channel> {
 	private String name;
 	private Date fromTime;
-	private Date toTime;
 	private List<Program> programmes;
 	
-	public Channel(String name, Date fromTime, Date toTime,	List<Program> programmes) {
+	/**
+	 * Konstruktor dat televizniho kanalu
+	 * @param name String jmeno kanalu
+	 * @param fromTime {@link Date} den pro ktery kanal obsahuje data
+	 * @param programmes {@link List} seznam {@link Program} instanci pro dany kanal na dany den
+	 */
+	public Channel(String name, Date fromTime, List<Program> programmes) {
 		this.name = name;
 		this.fromTime = fromTime;
-		this.toTime = toTime;
 		this.programmes = programmes;
 	}
 
@@ -35,13 +39,6 @@ public class Channel implements Comparable<Channel> {
 	 */
 	public Date getFromTime() {
 		return fromTime;
-	}
-
-	/**
-	 * @return the toTime
-	 */
-	public Date getToTime() {
-		return toTime;
 	}
 
 	/**

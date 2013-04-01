@@ -5,12 +5,8 @@ package gui;
 
 import java.awt.BorderLayout;
 
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import javax.swing.text.StyledDocument;
 
 import tvdata.Program;
 
@@ -25,6 +21,10 @@ public class ProgramDescriptionPanel extends JComponent {
 	
 	private final String STR_NO_DESCRIPTION = "No description";
 
+	/**
+	 * Standardni konstruktor komponenty s popiskem poradu.
+	 * Vytvari komponenty GUI
+	 */
 	public ProgramDescriptionPanel() {
 		this.setLayout(new BorderLayout());
 		
@@ -58,6 +58,9 @@ public class ProgramDescriptionPanel extends JComponent {
 		initText();
 	}
 
+	/**
+	 * Nastavi text jednotlivym komponentam dle stavu aktualne vybraneho programu
+	 */
 	private void initText() {
 		if (currentProgram != null) {
 			taTitle.setText(currentProgram.getTitle());
