@@ -1,7 +1,7 @@
 /**
  * 
  */
-package datasources;
+package datasources.parsers;
 
 import gui.Utils;
 
@@ -12,9 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,45 +30,12 @@ import datasources.exception.DataSourceException;
  * Trida predstavuje zdroj dat televizniho programu pro ceskou televizi
  * @author Pavel Janecka
  */
-public class CeskaTelevizeProgrammeSource {
-	private final Map<String, String> sources = new HashMap<String, String>();
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
+public class CeskaTelevizeDataSourceParser implements DataSourceParser {
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-	
-	/**
-	 * Konstruktor datoveho zdroje pro program ceske televize
-	 */
-	public CeskaTelevizeProgrammeSource() {
-		sources.put("ct1", "shedule.ct1.xml");
-		sources.put("ct2", "shedule.ct2.xml");
-		sources.put("ct4", "shedule.ct4.xml");
-		sources.put("ct24", "shedule.ct24.xml");
-	}
-	
-	/**
-	 * Nahraje vsechny programy registrovanych kanalu
-	 * @return {@link List} seznam kanalu
-	 * @throws DataSourceException pokud dojde pri cteni ze zdroje k nejake chybe
-	 */
-	public List<Channel> loadChannels() throws DataSourceException {
-		List<Channel> loadedChannels = new ArrayList<Channel>();
-		
-		// projde vsechny registrovane kanaly (ulozene v mape kanalu) a nacte jejich data
-		for (String source : sources.keySet()) {
-			File sourceFile = new File(sources.get(source));
-			loadedChannels.add(loadChannelFromXmlFile(sourceFile));
-		}
-		
-		return loadedChannels;
-	}
 
-	/**
-	 * Nacte informace o kanalu (programy) z datoveho zdroje
-	 * @param sourceFile {@link File} soubor se zdrojem dat
-	 * @return {@link Channel} instance
-	 * @throws DataSourceException pokud dojde pri cteni ze zdroje k nejake chybe
-	 */
-	private Channel loadChannelFromXmlFile(File sourceFile) throws DataSourceException {
+	@Override
+	public Channel loadChannelFromXmlFile(File sourceFile) throws DataSourceException {
 		try {
 			// priprava pro cteni z XML
 			Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(sourceFile);
@@ -78,8 +43,6 @@ public class CeskaTelevizeProgrammeSource {
 			
 			// ziskani data ke kteremu byl zdroj vytvoren
 			Date day = dateFormat.parse(document.getDocumentElement().getAttribute("datum_vysilani"));
-			// FIXME hacky! REMOVE
-			day = new Date(1364767200000L);
 			Calendar tommorow = Calendar.getInstance();
 			tommorow.setTime(day);
 			tommorow.add(Calendar.DATE, 1);

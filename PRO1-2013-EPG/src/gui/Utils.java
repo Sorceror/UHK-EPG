@@ -25,6 +25,8 @@ public class Utils {
 	public static final Color DEFAULT_APP_FONT_COLOR = Color.BLACK;
 	/** Default text if no program selected */
 	public static final String STR_NO_PROGRAM = "No program selected";
+	/** Relative path to folder with EPG data */
+	public static final String DATA_FOLDER_PATH = "./data";
 	
 	/**
 	 * Enable antialiasing on graphics context

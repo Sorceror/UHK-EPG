@@ -19,7 +19,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -27,8 +29,11 @@ import javax.swing.SwingUtilities;
 
 import tvdata.Channel;
 import tvdata.Program;
-import datasources.CeskaTelevizeProgrammeSource;
-import datasources.exception.DataSourceException;
+import datasources.DataStore;
+import datasources.parsers.CeskaTelevizeDataSourceParser;
+import datasources.parsers.DataSourceParser;
+import datasources.providers.CeskaTelevizeOnlineDataSourceProvider;
+import datasources.providers.OnlineDataSourceProvider;
 
 /**
  * Spousteci trida aplikace, vytvari GUI, vola datove providery
@@ -42,6 +47,8 @@ public class EPGApp {
 	private ProgressBarPanel progressBarPanel;
 	private TimelinePanel timelinePanel;
 	
+	private DataStore dataStore;
+	
 	private int mouseX = -1;
 
 	/**
@@ -51,12 +58,24 @@ public class EPGApp {
 		createGUI();
 		initListeners();
 		
-		CeskaTelevizeProgrammeSource ctSource = new CeskaTelevizeProgrammeSource();
+		dataStore = new DataStore();
+		OnlineDataSourceProvider ctProvider = new CeskaTelevizeOnlineDataSourceProvider();
+		DataSourceParser ctParser = new CeskaTelevizeDataSourceParser();
+		dataStore.registerChannelAndSource("ct1", ctProvider, ctParser);
+		dataStore.registerChannelAndSource("ct2", ctProvider, ctParser);
+		dataStore.registerChannelAndSource("ct4", ctProvider, ctParser);
+		dataStore.registerChannelAndSource("ct24", ctProvider, ctParser);
+		
+		Date now = new Date();
+		List<Channel> channels = new ArrayList<Channel>(4);
 		try {
-			List<Channel> channels = ctSource.loadChannels();
+			channels.add(dataStore.getDataForChannel("ct1", now));
+			channels.add(dataStore.getDataForChannel("ct2", now));
+			channels.add(dataStore.getDataForChannel("ct4", now));
+			channels.add(dataStore.getDataForChannel("ct24", now));
 			Collections.sort(channels);
 			timelinePanel.setChannels(channels);
-		} catch (DataSourceException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -133,7 +152,7 @@ public class EPGApp {
 				mouseX = e.getX();
 				if (SwingUtilities.isLeftMouseButton(e)) {
 					Program p = timelinePanel.getProgramByCoordinates(e.getX(), e.getY());
-					if (p != null) fireProgramChange(p);
+					fireProgramChange(p);
 					timelinePanel.setSelectedProgram(p);
 					timelinePanel.repaint();
 				}

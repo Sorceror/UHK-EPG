@@ -392,7 +392,10 @@ public class TimelinePanel extends JComponent {
 	public Program getProgramByCoordinates(int x, int y) {
 		Program result = null;
 		// first line (time marks)
+		if (y < lineHeight) return null;
 		y -= lineHeight;
+		if (x < channelNameWidth) return null;
+
 		int channelNum = y / lineHeight;
 		int sec = (int) pixelsToSeconds(x - scrollOffset);
 		Calendar cal = Calendar.getInstance();
