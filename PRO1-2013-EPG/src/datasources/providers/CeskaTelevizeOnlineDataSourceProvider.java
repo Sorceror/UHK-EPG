@@ -12,7 +12,8 @@ import java.util.Date;
  * @author Pavel Janecka
  */
 public class CeskaTelevizeOnlineDataSourceProvider implements OnlineDataSourceProvider {
-	private final String baseURL = "http://www.ceskatelevize.cz/services/programme/xml/schedule.php?user=test";
+//	private final String baseURL = "http://www.ceskatelevize.cz/services/programme/xml/schedule.php?user=test";
+	private final String baseURL = "http://edu.uhk.cz/~krizpa1/pro1/xml/ct/schedule.php?user=test";
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 	
 	@Override

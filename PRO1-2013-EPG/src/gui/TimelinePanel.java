@@ -67,6 +67,7 @@ public class TimelinePanel extends JComponent {
 	
 	private List<Channel> channels;
 	private Program selectedProgram;
+	private boolean isToday = false;
 	
 	/**
 	 * Konstruktor timeline
@@ -76,6 +77,7 @@ public class TimelinePanel extends JComponent {
 		timeThread.start();
 
 		scrollOffset = 0;
+		startDay = new Date();
 		initZoomConstants();
 		resetScrollOffset();
 	}
@@ -84,9 +86,8 @@ public class TimelinePanel extends JComponent {
 	 * Nastavuje offset posunuti tak, aby zobrazovany cas predchazel o urcity pocet minut aktualni cas 
 	 */
 	private void resetScrollOffset() {
-		Date now = new Date();
 		Calendar timeMark = Calendar.getInstance();
-		timeMark.setTime(now);
+		timeMark.setTime(Utils.setTimeFromSecondDate(startDay, new Date()));
 		timeMark.add(Calendar.MINUTE, -90);
 		scrollOffset = -secondsToPixels(Utils.getTimeInSeconds(timeMark.getTime()));
 	}
@@ -100,7 +101,7 @@ public class TimelinePanel extends JComponent {
 		Graphics2D g2d = (Graphics2D) g;
 		Utils.enableAntialiasing(g2d);
 
-		Date now = new Date();
+		Date now = Utils.setTimeFromSecondDate(startDay, new Date());
 		int y = lineHeight;
 		int x = scrollOffset;
 		
@@ -110,7 +111,8 @@ public class TimelinePanel extends JComponent {
 			y += lineHeight;
 		}
 		paintTimeMarks(g2d, x, 0, y + lineHeight / 2);
-		paintCurrentTimeMark(g2d, lineHeight / 2, y + channelPadding, now);
+		// aktualni cas ma vyznam vykreslovat pouze pokud je vybrany den aktualni
+		if (isToday) paintCurrentTimeMark(g2d, lineHeight / 2, y + channelPadding, now);
 	}
 
 	/**
@@ -151,7 +153,7 @@ public class TimelinePanel extends JComponent {
 	private void paintProgram(Graphics2D g, Program p, int startX, int startY, int fontCenterY, Date now) {
 		int x = secondsToPixels((Utils.dateDifference(p.getStartTime(), Utils.getMidnight(now)).getTime() / 1000d)) + startX;
 		int programWidth = (int)(p.getLength() * pixelPerSecond);
-		paintProgramOnCoors(g, x, startY, fontCenterY, programWidth, p, now);
+		paintProgramOnCoors(g, x, startY, fontCenterY, programWidth, p);
 	}
 	
 	/**
@@ -162,9 +164,10 @@ public class TimelinePanel extends JComponent {
 	 * @param fontCenterY int y souradnice stredu radku kanalu
 	 * @param programWidth int sirka policka programu
 	 * @param p {@link Program} program pro vykresleni
-	 * @param now {@link Date} aktualni cas
 	 */
-	private void paintProgramOnCoors(Graphics2D g, int x, int y, int fontCenterY, int programWidth, Program p, Date now) {
+	private void paintProgramOnCoors(Graphics2D g, int x, int y, int fontCenterY, int programWidth, Program p) {
+		// barva kanalu musi byt urcena z aktualniho casu a data (ne z aktualne nastaveneho)
+		Date now = new Date();
 		Color bgColor = futureProgramBackground;
 		Color fontColor = futureProgramFontColor;
 		if (p.getStartTime().before(now)) {
@@ -309,6 +312,10 @@ public class TimelinePanel extends JComponent {
 		startDay = Utils.getMidnight(firstProgram);
 		startHour = c.get(Calendar.HOUR_OF_DAY);
 		totalHours = (int) Math.ceil((Utils.dateDifference(lastProgram, firstProgram).getTime() / 3600000d));
+		
+		Date now = new Date();
+		if (now.after(firstProgram) && now.before(lastProgram)) isToday = true;
+		else isToday = false;
 	}
 
 	/**

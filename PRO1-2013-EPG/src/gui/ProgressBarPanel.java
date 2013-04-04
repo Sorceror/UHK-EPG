@@ -83,8 +83,8 @@ public class ProgressBarPanel extends JComponent {
 	}
 
 	/**
-	 * Set selected program as current focused program
-	 * @param program
+	 * Nastavy vybrany porad pro zobrazeni
+	 * @param program {@link Program} instance
 	 */
 	public void setProgram(Program program) {
 		this.currentProgram = program;
