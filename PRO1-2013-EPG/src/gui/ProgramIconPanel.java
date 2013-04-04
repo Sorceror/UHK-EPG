@@ -70,7 +70,7 @@ public class ProgramIconPanel extends JComponent {
 	
 	/**
 	 * Set selected program as current focused program
-	 * @param program
+	 * @param program {@link Program} instance
 	 */
 	public void setProgram(Program program) {
 		this.currentProgram = program;

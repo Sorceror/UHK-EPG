@@ -40,7 +40,7 @@ public class DataStore {
 	
 	/**
 	 * Konstruktor datoveho skladu na zadane ceste, vytvari adresarovou strukturu pro data pokud neexistuje
-	 * @param path
+	 * @param path String cesta k datovemu skladu (slozka)
 	 */
 	public DataStore(String path) {
 		pathToData = path;

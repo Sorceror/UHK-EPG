@@ -384,7 +384,7 @@ public class TimelinePanel extends JComponent {
 	
 	/**
 	 * Posune timeline o dany pocet pixelu doprava (kladna hodnota), doleva (zaporna hodnota)
-	 * @param delta
+	 * @param delta int
 	 */
 	public void moveTimeline(int delta) {
 		scrollOffset += delta;
@@ -491,7 +491,7 @@ public class TimelinePanel extends JComponent {
 	
 	/**
 	 * Nastavuje vzor (pattern) formatu casovych udaju pro timeline (standardni pattern <code>"HH:mm"</code>)
-	 * @param timePattern
+	 * @param timePattern String 
 	 * @see SimpleDateFormat
 	 */
 	public void setTimeFormatPattern(String timePattern) {

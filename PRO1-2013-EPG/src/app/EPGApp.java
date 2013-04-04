@@ -279,7 +279,7 @@ public class EPGApp {
 
 	/**
 	 * main :)
-	 * @param args
+	 * @param args String array
 	 */
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
