@@ -17,6 +17,7 @@ public class Program {
 	private int length;
 	private String description;
 	private URL imageURL;
+	private ProgramInfo programInfo;
 	
 	/**
 	 * Konstruktor poradu
@@ -100,5 +101,30 @@ public class Program {
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 		initLength();
+	}
+
+	/**
+	 * @return the programInfo
+	 */
+	public ProgramInfo getProgramInfo() {
+		return programInfo;
+	}
+
+	/**
+	 * @param programInfo the programInfo to set
+	 */
+	public void setProgramInfo(ProgramInfo programInfo) {
+		this.programInfo = programInfo;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Program [title=" + title + ", startTime=" + startTime
+				+ ", endTime=" + endTime + ", length=" + length
+				+ ", description=" + description + ", imageURL=" + imageURL
+				+ ", programInfo=" + programInfo + "]";
 	}
 }

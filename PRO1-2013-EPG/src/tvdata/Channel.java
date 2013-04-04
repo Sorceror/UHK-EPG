@@ -52,5 +52,14 @@ public class Channel implements Comparable<Channel> {
 	public int compareTo(Channel o) {
 		return this.name.compareTo(o.name);
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Channel [name=" + name + ", fromTime=" + fromTime
+				+ ", programmes=" + programmes + "]";
+	}
+
 }

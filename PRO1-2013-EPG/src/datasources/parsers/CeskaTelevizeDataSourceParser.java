@@ -24,6 +24,8 @@ import org.w3c.dom.NodeList;
 
 import tvdata.Channel;
 import tvdata.Program;
+import tvdata.ProgramInfo;
+import tvdata.enums.SoundType;
 import datasources.exception.DataSourceException;
 
 /**
@@ -65,6 +67,7 @@ public class CeskaTelevizeDataSourceParser implements DataSourceParser {
 					int length = parseProgramLength(element);
 					String description = parseProgramDescription(element);
 					URL url = parseProgramImage(element);
+					ProgramInfo programInfo = parseAditionalInfo(element);
 
 					// dodatecne vypocty
 					Calendar calEnd = Calendar.getInstance();
@@ -93,6 +96,7 @@ public class CeskaTelevizeDataSourceParser implements DataSourceParser {
 					// samotne vytvoreni instance poradu a pridani do seznamu
 					Program p = new Program(title, startTime, endTime, description);
 					if (url != null) p.setImageURL(url);
+					if (programInfo != null) p.setProgramInfo(programInfo);
 					schedule.add(p);
 				}
 			}
@@ -185,5 +189,84 @@ public class CeskaTelevizeDataSourceParser implements DataSourceParser {
 		}
 		
 		return name;
+	}
+	
+	/**
+	 * Parsuje dodatecne info k programu (muze obsahovat null hodnoty)
+	 * @param program {@link Element} prvek XML
+	 * @return {@link ProgramInfo} instance
+	 */
+	private ProgramInfo parseAditionalInfo(Element program) {
+		ProgramInfo programInfo = new ProgramInfo();
+		
+		String showName = program.getElementsByTagName("nadtitul").item(0).getTextContent();
+		if (showName != null && !showName.isEmpty()) programInfo.setShowName(showName);
+		String originalName = program.getElementsByTagName("original").item(0).getTextContent();
+		if (originalName != null && !originalName.isEmpty()) programInfo.setOriginalName(originalName);
+		String episodeName = program.getElementsByTagName("nazev_casti").item(0).getTextContent();
+		if (episodeName != null && !episodeName.isEmpty()) programInfo.setOriginalName(originalName);
+		String genre = program.getElementsByTagName("zanr").item(0).getTextContent();
+		if (genre != null && !genre.isEmpty()) programInfo.setGenre(genre);
+		String aspectRatio = program.getElementsByTagName("pomer").item(0).getTextContent();
+		if (aspectRatio != null && !aspectRatio.isEmpty()) programInfo.setPictureAspectRatio(aspectRatio);
+		
+		String part = program.getElementsByTagName("dil").item(0).getTextContent();
+		if (part != null && !part.isEmpty()) {
+			String[] strs = part.split("/");
+			if (strs.length == 2) {
+				try {
+					Integer partNum = Integer.parseInt(strs[0]);
+					Integer totalNum = Integer.parseInt(strs[1]);
+					programInfo.setEpisodeCount(partNum);
+					programInfo.setEpisodesInSeason(totalNum);
+				} catch (NumberFormatException e) { /* nic se nedeje */ }
+			}
+		}
+		
+		String programURL = program.getElementsByTagName("program").item(0).getTextContent();
+		if (programURL != null && !programURL.isEmpty()) {
+			try {
+				programInfo.setProgramURL(new URL(programURL));
+			} catch (MalformedURLException e) { /* nic se nedeje */ }
+		}
+		String iVisilaniURL = program.getElementsByTagName("ivysilani").item(0).getTextContent();
+		if (iVisilaniURL != null && !iVisilaniURL.isEmpty()) {
+			try {
+				programInfo.setStreamPageURL(new URL(iVisilaniURL));
+			} catch (MalformedURLException e) { /* nic se nedeje */ }
+		}
+		
+		String soundType = program.getElementsByTagName("zvuk").item(0).getTextContent();
+		if (soundType != null && !soundType.isEmpty()) programInfo.setSoundType(SoundType.fromString(soundType));
+		
+		String hiddenSubtitles = program.getElementsByTagName("skryte_titulky").item(0).getTextContent();
+		programInfo.setHiddenSubtitles(booleanFromString(hiddenSubtitles));
+		String forDeaf = program.getElementsByTagName("neslysici").item(0).getTextContent();
+		programInfo.setCommentsForDeafPeople(booleanFromString(forDeaf));
+		String live = program.getElementsByTagName("live").item(0).getTextContent();
+		programInfo.setLiveShow(booleanFromString(live));
+		String premiere = program.getElementsByTagName("premiera").item(0).getTextContent();
+		programInfo.setPremiere(booleanFromString(premiere));
+		String bw = program.getElementsByTagName("cb").item(0).getTextContent();
+		programInfo.setBlackAndWhiteOnly(booleanFromString(bw));
+		String notForChildren = program.getElementsByTagName("hvezdicka").item(0).getTextContent();
+		programInfo.setNotForChildren(booleanFromString(notForChildren));
+		String originalDubbing = program.getElementsByTagName("puvodni_zneni").item(0).getTextContent();
+		programInfo.setOriginalDubbing(booleanFromString(originalDubbing));
+		
+		return programInfo;
+	}
+	
+	/**
+	 * Converts string boolean representation (0 - false, 1 - true) to {@link Boolean} instance
+	 * @param str String
+	 * @return {@link Boolean} instance or null (for other values that 0/1)
+	 */
+	private Boolean booleanFromString(String str) {
+		if (str != null && !str.isEmpty()) {
+			if (str.equals("1")) return Boolean.TRUE;
+			if (str.equals("0")) return Boolean.FALSE;
+		}
+		return null;
 	}
 }
