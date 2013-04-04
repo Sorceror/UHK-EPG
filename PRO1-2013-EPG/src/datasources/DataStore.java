@@ -28,6 +28,7 @@ public class DataStore {
 	private String pathToData;
 	private Map<String, OnlineDataSourceProvider> providers = new HashMap<String, OnlineDataSourceProvider>();
 	private Map<String, DataSourceParser> parsers = new HashMap<String, DataSourceParser>();
+	private Map<String, Channel> internalCache = new HashMap<String, Channel>();
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	
 	/**
@@ -78,8 +79,24 @@ public class DataStore {
 	 * @throws Exception pokud dojde k chybe pri ziskavani nebo zpracovani dat 
 	 */
 	public Channel getDataForChannel(String key, Date date) throws Exception {
-		File data = loadData(key, date);
-		return parseData(parsers.get(key), data);
+		Channel channel = null;
+		if (internalCache.containsKey(generateInternalCacheKey(key, date))) channel = internalCache.get(generateInternalCacheKey(key, date));
+		else {
+			File data = loadData(key, date);
+			channel = parseData(parsers.get(key), data);
+			internalCache.put(generateInternalCacheKey(key, date), channel);
+		}
+		return channel;
+	}
+	
+	/**
+	 * Generuje klic do interni cache naparsovanych kanalu
+	 * @param key String jmeno kanalu
+	 * @param date {@link Date} den pro ktery maji byt ziskany data ze zdroje
+	 * @return String klic
+	 */
+	private String generateInternalCacheKey(String key, Date date) {
+		return key + dateFormat.format(date); 
 	}
 
 	/**

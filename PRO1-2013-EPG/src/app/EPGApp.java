@@ -162,20 +162,36 @@ public class EPGApp {
 		window.setVisible(true);
 	}
 	
+	/**
+	 * Nastavuje datum zobrazeni EPG na vybrany den
+	 * @param selectedDate {@link Date} instance
+	 */
+	private void changeDate(Date selectedDate) {
+		try {
+			loadDataForDay(selectedDate);
+			currentDay = selectedDate;
+		} catch (Exception e) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+			JOptionPane.showMessageDialog(window, "Cannot load data for date " + dateFormat.format(selectedDate), "Error during loading", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	/**
+	 * Nastavuje datum zobrazeni dle zmeny poctu dnu od aktualne zobrazovaneho dne
+	 * @param dayOffset int zmena poctu dnu
+	 */
 	private void changeDate(int dayOffset) {
 		Calendar c = Calendar.getInstance();
 		c.setTime(currentDay);
 		c.add(Calendar.DAY_OF_YEAR, dayOffset);
-		Date tmpDate = c.getTime();
-		try {
-			loadDataForDay(tmpDate);
-			currentDay = tmpDate;
-		} catch (Exception e) {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-			JOptionPane.showMessageDialog(window, "Cannot load data for date " + dateFormat.format(tmpDate), "Error during loading", JOptionPane.ERROR_MESSAGE);
-		}
+		changeDate(c.getTime());
 	}
 	
+	/**
+	 * Nahraje data pro vybrany den a zobrazi je v gui EPG
+	 * @param day {@link Date} instance
+	 * @throws Exception pokud dojde k chybe pri nahravani dat
+	 */
 	private void loadDataForDay(Date day) throws Exception {
 		List<Channel> channels = new ArrayList<Channel>(4);
 		channels.add(dataStore.getDataForChannel("ct1", day));
@@ -184,7 +200,9 @@ public class EPGApp {
 		channels.add(dataStore.getDataForChannel("ct24", day));
 		Collections.sort(channels);
 		timelinePanel.setChannels(channels);
+		timelinePanel.repaint();
 		datePanel.setCurrentDate(day);
+		datePanel.repaint();
 		fireProgramChange(null);
 	}
 
@@ -236,6 +254,7 @@ public class EPGApp {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_R) {
+					changeDate(new Date());
 					timelinePanel.resetZoom();
 					timelinePanel.resetMoveOfTimeline();
 					timelinePanel.repaint();
